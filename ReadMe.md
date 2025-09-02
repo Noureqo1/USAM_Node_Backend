@@ -1,25 +1,28 @@
-# Skills API
+# Skills & Ideas API
 
-A RESTful API built with Express.js for managing and serving skills data. This project demonstrates fundamental backend development concepts including REST architecture, HTTP methods, middleware implementation, and JSON data handling.
+A RESTful API built with Express.js for managing skills data and project ideas with persistent database storage. This project demonstrates fundamental backend development concepts including REST architecture, HTTP methods, middleware implementation, database integration, and CRUD operations.
 
 ## 🎯 Project Overview
 
-This API serves as a backend service that exposes skills data through well-structured endpoints, allowing frontend applications or other services to consume the data. It's part of a 5-week backend learning journey, specifically designed for Week 2 to introduce RESTful API development.
+This API serves as a backend service that exposes both skills data (from JSON files) and project ideas (from SQLite database) through well-structured endpoints. It's part of a 5-week backend learning journey, extending Week 2's skills API with Week 3's database integration and CRUD operations.
 
 ## 🚀 Features
 
 - **RESTful API Design**: Follows REST principles for predictable and scalable endpoints
 - **Express.js Framework**: Built using the popular Node.js web framework
+- **Database Integration**: SQLite database for persistent storage of project ideas
+- **CRUD Operations**: Complete Create, Read, Update, Delete functionality for ideas
 - **CORS Support**: Enables cross-origin requests for frontend integration
 - **Request Logging**: Middleware for tracking API requests
 - **Error Handling**: Comprehensive error responses with appropriate HTTP status codes
-- **Query Parameters**: Support for filtering and sorting data
-- **JSON Data Storage**: File-based data storage using JSON
+- **Query Parameters**: Support for filtering and sorting skills data
+- **Dual Data Sources**: JSON files for skills, SQLite database for ideas
 
 ## 🛠 Technologies Used
 
 - **Node.js**: JavaScript runtime environment
 - **Express.js**: Web application framework
+- **SQLite3**: Lightweight, file-based SQL database
 - **CORS**: Cross-Origin Resource Sharing middleware
 - **File System (fs)**: For reading JSON data files
 - **Nodemon**: Development tool for auto-restarting the server
@@ -41,10 +44,11 @@ This API serves as a backend service that exposes skills data through well-struc
    npm install
    ```
 
-3. **Install development dependencies**
+3. **Initialize the database**
    ```bash
-   npm install --save-dev nodemon
+   npm run init-db
    ```
+   This creates the SQLite database and populates it with sample project ideas.
 
 4. **Start the server**
    ```bash
@@ -57,18 +61,28 @@ This API serves as a backend service that exposes skills data through well-struc
 
 5. **Verify the API is running**
    - Open your browser and navigate to `http://localhost:3001`
-   - You should see the API welcome message
+   - You should see the API welcome message with all available endpoints
 
 ## 📚 API Endpoints
 
 ### Base URL: `http://localhost:3001`
 
+#### Skills Endpoints (JSON-based)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/` | API information and available endpoints |
 | GET | `/api/skills` | Get all skills (with optional filtering) |
 | GET | `/api/skills/:id` | Get a specific skill by ID |
 | GET | `/api/skills/category/:category` | Get skills by category |
+
+#### Ideas Endpoints (Database-based)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/ideas` | Get all project ideas |
+| GET | `/api/ideas/:id` | Get a specific idea by ID |
+| POST | `/api/ideas` | Create a new project idea |
+| PUT | `/api/ideas/:id` | Update an existing idea |
+| DELETE | `/api/ideas/:id` | Delete an idea |
 
 ### Query Parameters for `/api/skills`
 
@@ -78,6 +92,7 @@ This API serves as a backend service that exposes skills data through well-struc
 
 ## 🔍 Example Requests
 
+### Skills API Examples
 ```bash
 # Get all skills
 curl http://localhost:3001/api/skills
@@ -91,18 +106,35 @@ curl "http://localhost:3001/api/skills?proficiency=expert"
 # Filter by category
 curl "http://localhost:3001/api/skills?category=programming"
 
-# Get skills in specific category
-curl http://localhost:3001/api/skills/category/programming%20language
-
 # Sort skills alphabetically
 curl "http://localhost:3001/api/skills?sort=name"
-
-# Combine filters
-curl "http://localhost:3001/api/skills?proficiency=expert&sort=name"
 ```
 
-## 📊 Sample Response
+### Ideas API Examples
+```bash
+# Get all ideas
+curl http://localhost:3001/api/ideas
 
+# Get idea with ID 1
+curl http://localhost:3001/api/ideas/1
+
+# Create a new idea
+curl -X POST http://localhost:3001/api/ideas \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Smart Garden Monitor", "description": "IoT sensors to monitor plant health", "status": "Planning"}'
+
+# Update an existing idea
+curl -X PUT http://localhost:3001/api/ideas/1 \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Updated Idea Title", "description": "Updated description", "status": "In Progress"}'
+
+# Delete an idea
+curl -X DELETE http://localhost:3001/api/ideas/1
+```
+
+## 📊 Sample Responses
+
+### Skills Response
 ```json
 {
   "success": true,
@@ -114,13 +146,22 @@ curl "http://localhost:3001/api/skills?proficiency=expert&sort=name"
       "category": "Programming Language",
       "proficiency": "Expert",
       "description": "Modern JavaScript including ES6+ features"
-    },
+    }
+  ]
+}
+```
+
+### Ideas Response
+```json
+{
+  "success": true,
+  "count": 5,
+  "data": [
     {
-      "id": 2,
-      "name": "Node.js",
-      "category": "Runtime Environment",
-      "proficiency": "Intermediate",
-      "description": "Server-side JavaScript development"
+      "id": 1,
+      "title": "Eco-Friendly Water Bottle",
+      "description": "A smart water bottle that tracks hydration and suggests refill stations.",
+      "status": "Concept"
     }
   ]
 }
@@ -136,8 +177,12 @@ skills-api/
 │   ├── addUser.js
 │   ├── generateData.js
 │   ├── readData.js
-│   └── package.json
+│   └── users.json
+├── tests/
+│   └── postman/             # Postman test screenshots
 ├── server.js                # Main server file
+├── init-db.js               # Database initialization script
+├── database.sqlite          # SQLite database file (created after init)
 ├── package.json             # Project dependencies and scripts
 ├── README.md                # Project documentation
 └── API.md                   # API endpoint documentation
@@ -147,28 +192,50 @@ skills-api/
 
 You can test the API using various tools:
 
-1. **Browser**: Navigate to endpoints directly for GET requests
+1. **Browser**: Navigate to GET endpoints directly
 2. **Postman**: Import the endpoints for comprehensive testing
 3. **curl**: Use command-line requests (examples provided above)
 4. **Thunder Client**: VS Code extension for API testing
+
+### Testing CRUD Operations
+
+1. **Create**: POST new ideas with JSON body containing `title`, `description`, and `status`
+2. **Read**: GET all ideas or specific ideas by ID
+3. **Update**: PUT requests to modify existing ideas
+4. **Delete**: DELETE requests to remove ideas
 
 ## 🚦 Error Handling
 
 The API includes comprehensive error handling:
 
+- **400 Bad Request**: Invalid request data or database errors
 - **404 Not Found**: For non-existent routes or resources
-- **500 Internal Server Error**: For server-side errors (e.g., file reading issues)
+- **500 Internal Server Error**: For server-side errors
 - All errors return JSON responses with `success: false` and descriptive messages
 
 ## 🔧 Development Scripts
 
 ```bash
-npm start      # Start the server in production mode
-npm run dev    # Start the server in development mode with nodemon
+npm start       # Start the server in production mode
+npm run dev     # Start the server in development mode with nodemon
+npm run init-db # Initialize the SQLite database with sample data
+```
+
+## 💾 Database Schema
+
+### Ideas Table
+```sql
+CREATE TABLE ideas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    description TEXT,
+    status TEXT DEFAULT 'Concept'
+);
 ```
 
 ## 🎓 Learning Objectives Achieved
 
+**Week 2 (Skills API):**
 - ✅ Express.js framework setup and configuration
 - ✅ RESTful API design principles
 - ✅ HTTP methods implementation (GET)
@@ -179,29 +246,33 @@ npm run dev    # Start the server in development mode with nodemon
 - ✅ Query parameter processing
 - ✅ File-based data operations with async/await
 
-## 🔮 Next Steps (Week 3 Preview)
+**Week 3 (Database Integration):**
+- ✅ SQLite database setup and connection
+- ✅ Database initialization and table creation
+- ✅ CRUD operations implementation
+- ✅ Asynchronous database operations with callbacks
+- ✅ SQL query execution (SELECT, INSERT, UPDATE, DELETE)
+- ✅ Database error handling
+- ✅ Data persistence and management
+- ✅ Graceful database connection handling
+
+## 🔮 Next Steps (Week 4 Preview)
 
 In the upcoming week, this API will be enhanced with:
-- Database integration (replacing file-based storage)
-- CRUD operations (POST, PUT, DELETE)
-- Data validation and sanitization
-- Advanced error handling
+- Advanced database operations and relationships
+- Authentication and authorization mechanisms
+- JWT token-based security
+- User management and protected routes
+- Input validation and sanitization
 
 ## 📝 Notes
 
-- The API currently uses file-based JSON storage for simplicity
-- All endpoints return JSON responses
+- Skills data uses file-based JSON storage (Week 2 implementation)
+- Ideas data uses SQLite database for persistence (Week 3 implementation)
+- Database file is created automatically when running `npm run init-db`
+- All endpoints return JSON responses with consistent structure
 - Request logging is enabled for development monitoring
 - CORS is configured to allow all origins (suitable for development)
+- Graceful shutdown handling ensures database connections are properly closed
 
-## 🤝 Contributing
-
-This is a learning project. Feel free to experiment with:
-- Adding new endpoints
-- Implementing additional query parameters
-- Enhancing error handling
-- Adding data validation
-
----
-
-**Week 2 Backend Development Assessment - RESTful API with Express.js**
+**Week 3 Backend Development Assessment - Database Integration & CRUD Operations**
