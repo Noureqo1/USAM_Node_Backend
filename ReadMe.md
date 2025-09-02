@@ -275,15 +275,4 @@ In the upcoming week, this API will be enhanced with:
 - CORS is configured to allow all origins (suitable for development)
 - Graceful shutdown handling ensures database connections are properly closed
 
-## 🤝 Contributing
-
-This is a learning project. Feel free to experiment with:
-- Adding new endpoints for skills CRUD operations
-- Implementing additional query parameters for ideas
-- Adding data validation middleware
-- Enhancing error handling and logging
-- Creating database relationships
-
----
-
 **Week 3 Backend Development Assessment - Database Integration & CRUD Operations**
