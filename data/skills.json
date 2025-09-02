@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "name": "JavaScript",
+    "category": "Programming Language",
+    "proficiency": "Expert",
+    "description": "Modern JavaScript including ES6+ features"
+  },
+  {
+    "id": 2,
+    "name": "Node.js",
+    "category": "Runtime Environment",
+    "proficiency": "Intermediate",
+    "description": "Server-side JavaScript development"
+  },
+  {
+    "id": 3,
+    "name": "React",
+    "category": "Frontend Framework",
+    "proficiency": "Advanced",
+    "description": "Building interactive user interfaces"
+  },
+  {
+    "id": 4,
+    "name": "Express.js",
+    "category": "Backend Framework",
+    "proficiency": "Intermediate",
+    "description": "Web application framework for Node.js"
+  },
+  {
+    "id": 5,
+    "name": "Problem Solving",
+    "category": "Soft Skill",
+    "proficiency": "Expert",
+    "description": "Analytical thinking and solution development"
+  },
+  {
+    "id": 6,
+    "name": "MongoDB",
+    "category": "Database",
+    "proficiency": "Intermediate",
+    "description": "NoSQL database for modern applications"
+  },
+  {
+    "id": 7,
+    "name": "Git",
+    "category": "Version Control",
+    "proficiency": "Advanced",
+    "description": "Distributed version control system"
+  },
+  {
+    "id": 8,
+    "name": "RESTful APIs",
+    "category": "Web Development",
+    "proficiency": "Advanced",
+    "description": "Designing and implementing REST APIs"
+  }
+]
