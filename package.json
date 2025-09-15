@@ -7,7 +7,15 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "init-db": "node init-db.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop ecosystem.config.js",
+    "pm2:restart": "pm2 restart ecosystem.config.js",
+    "pm2:delete": "pm2 delete ecosystem.config.js",
+    "pm2:logs": "pm2 logs",
+    "pm2:monit": "pm2 monit"
   },
   "keywords": ["express", "api", "rest", "skills", "ideas", "nodejs", "sqlite", "jwt", "authentication"],
   "author": "",
@@ -21,6 +29,22 @@
     "dotenv": "^16.3.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "pm2": "^5.3.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!node_modules/**",
+      "!coverage/**",
+      "!ecosystem.config.js"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.js",
+      "**/?(*.)+(spec|test).js"
+    ]
   }
 }
