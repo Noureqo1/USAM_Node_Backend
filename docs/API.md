@@ -2,7 +2,7 @@
 
 ## Base URL
 ```
-http://localhost:3001
+http://localhost:5000
 ```
 
 ## Endpoints
@@ -141,20 +141,20 @@ GET /api/skills/category/programming%20language
 
 ```bash
 # Get all skills
-curl http://localhost:3001/api/skills
+curl http://localhost:5000/api/skills
 
 # Get skill by ID
-curl http://localhost:3001/api/skills/1
+curl http://localhost:5000/api/skills/1
 
 # Filter by proficiency
-curl "http://localhost:3001/api/skills?proficiency=expert"
+curl "http://localhost:5000/api/skills?proficiency=expert"
 
 # Filter by category
-curl "http://localhost:3001/api/skills?category=programming"
+curl "http://localhost:5000/api/skills?category=programming"
 
 # Get skills by category
-curl http://localhost:3001/api/skills/category/programming%20language
+curl http://localhost:5000/api/skills/category/programming%20language
 
 # Sort by name
-curl "http://localhost:3001/api/skills?sort=name"
+curl "http://localhost:5000/api/skills?sort=name"
 ```

@@ -29,7 +29,7 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
             description TEXT,
             status TEXT DEFAULT 'Concept',
             userId INTEGER,
-            createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+            createdAt DATETIME,
             FOREIGN KEY (userId) REFERENCES users (id)
         )`, (err) => {
             if (err) {
@@ -47,11 +47,20 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
                 });
                 
                 // Add createdAt column to existing ideas table if it doesn't exist
-                db.run(`ALTER TABLE ideas ADD COLUMN createdAt DATETIME DEFAULT CURRENT_TIMESTAMP`, (err) => {
+                db.run(`ALTER TABLE ideas ADD COLUMN createdAt DATETIME`, (err) => {
                     if (err && !err.message.includes("duplicate column")) {
                         console.error("Error adding createdAt column:", err.message);
                     } else if (!err) {
                         console.log("Added createdAt column to ideas table.");
+                        
+                        // Update existing rows with current timestamp
+                        db.run(`UPDATE ideas SET createdAt = CURRENT_TIMESTAMP WHERE createdAt IS NULL`, (updateErr) => {
+                            if (updateErr) {
+                                console.error("Error updating createdAt values:", updateErr.message);
+                            } else {
+                                console.log("Updated existing ideas with createdAt timestamps.");
+                            }
+                        });
                     }
                 });
                 
@@ -62,7 +71,7 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
                     } else if (row.count === 0) {
                         console.log("Inserting initial data...");
                         
-                        const insert = "INSERT INTO ideas (title, description, status) VALUES (?, ?, ?)";
+                        const insert = "INSERT INTO ideas (title, description, status, createdAt) VALUES (?, ?, ?, CURRENT_TIMESTAMP)";
                         
                         // Insert sample ideas
                         const sampleIdeas = [
