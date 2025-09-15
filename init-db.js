@@ -8,17 +8,52 @@ const db = new sqlite3.Database("./database.sqlite", (err) => {
     } else {
         console.log("Connected to the SQLite database.");
         
-        // Create ideas table
+        // Create users table
+        db.run(`CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`, (err) => {
+            if (err) {
+                console.error("Error creating users table:", err.message);
+            } else {
+                console.log("Users table created or already exists.");
+            }
+        });
+        
+        // Create ideas table with userId foreign key
         db.run(`CREATE TABLE IF NOT EXISTS ideas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             description TEXT,
-            status TEXT DEFAULT 'Concept'
+            status TEXT DEFAULT 'Concept',
+            userId INTEGER,
+            createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (userId) REFERENCES users (id)
         )`, (err) => {
             if (err) {
-                console.error("Error creating table:", err.message);
+                console.error("Error creating ideas table:", err.message);
             } else {
                 console.log("Ideas table created or already exists.");
+                
+                // Add userId column to existing ideas table if it doesn't exist
+                db.run(`ALTER TABLE ideas ADD COLUMN userId INTEGER`, (err) => {
+                    if (err && !err.message.includes("duplicate column")) {
+                        console.error("Error adding userId column:", err.message);
+                    } else if (!err) {
+                        console.log("Added userId column to ideas table.");
+                    }
+                });
+                
+                // Add createdAt column to existing ideas table if it doesn't exist
+                db.run(`ALTER TABLE ideas ADD COLUMN createdAt DATETIME DEFAULT CURRENT_TIMESTAMP`, (err) => {
+                    if (err && !err.message.includes("duplicate column")) {
+                        console.error("Error adding createdAt column:", err.message);
+                    } else if (!err) {
+                        console.log("Added createdAt column to ideas table.");
+                    }
+                });
                 
                 // Check if table is empty and insert initial data
                 db.get("SELECT COUNT(*) as count FROM ideas", (err, row) => {

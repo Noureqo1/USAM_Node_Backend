@@ -1,7 +1,7 @@
 {
   "name": "skills-api",
   "version": "1.0.0",
-  "description": "RESTful API for managing skills data and project ideas using Express.js with SQLite database",
+  "description": "RESTful API for managing skills data and project ideas using Express.js with SQLite database and JWT authentication",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,13 +9,16 @@
     "init-db": "node init-db.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["express", "api", "rest", "skills", "ideas", "nodejs", "sqlite"],
+  "keywords": ["express", "api", "rest", "skills", "ideas", "nodejs", "sqlite", "jwt", "authentication"],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
-    "sqlite3": "^5.1.6"
+    "sqlite3": "^5.1.6",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

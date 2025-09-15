@@ -1,8 +1,12 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs').promises;
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const authMiddleware = require('./authMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
