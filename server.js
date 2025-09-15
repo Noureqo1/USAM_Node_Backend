@@ -9,26 +9,60 @@ const jwt = require('jsonwebtoken');
 const authMiddleware = require('./authMiddleware');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
-// Database connection
-const db = new sqlite3.Database('./database.sqlite', (err) => {
+// CORS configuration for production
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        if (NODE_ENV === 'development') {
+            // In development, allow all origins
+            return callback(null, true);
+        } else {
+            // In production, only allow specific trusted origins
+            const allowedOrigins = [
+                'https://yourdomain.com',
+                'https://www.yourdomain.com',
+                'https://api.yourdomain.com'
+            ];
+            
+            if (allowedOrigins.indexOf(origin) !== -1) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        }
+    },
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
+// Database connection with environment-specific configuration
+const dbPath = NODE_ENV === 'production' ? '/app/data/database.sqlite' : 
+               NODE_ENV === 'test' ? `./test_database_${process.env.TEST_DB_SUFFIX || Date.now()}.sqlite` : 
+               './database.sqlite';
+const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('Error opening database:', err.message);
     } else {
-        console.log('Connected to the SQLite database.');
+        console.log(`Connected to the SQLite database in ${NODE_ENV} mode.`);
     }
 });
 
-// Request logging middleware
+// Request logging middleware with environment-specific logging
 const requestLogger = (req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+    if (NODE_ENV === 'development') {
+        console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+    }
     next();
 };
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '10mb' })); // Add request size limit
 app.use(requestLogger);
 
 // Basic route
@@ -445,19 +479,44 @@ app.use('*', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log(`Visit http://localhost:${PORT} to see the API`);
-});
+let server;
+if (NODE_ENV !== 'test') {
+    server = app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+        console.log(`Visit http://localhost:${PORT} to see the API`);
+        
+        // Signal PM2 that the process is ready (for cluster mode)
+        if (process.send) {
+            process.send('ready');
+        }
+    });
+}
+
+// Export app for testing
+module.exports = app;
 
 // Graceful shutdown
 process.on('SIGINT', () => {
-    db.close((err) => {
-        if (err) {
-            console.error('Error closing database:', err.message);
-        } else {
-            console.log('Database connection closed.');
-        }
-        process.exit(0);
-    });
+    console.log('\nShutting down gracefully...');
+    if (server) {
+        server.close(() => {
+            db.close((err) => {
+                if (err) {
+                    console.error('Error closing database:', err.message);
+                } else {
+                    console.log('Database connection closed.');
+                }
+                process.exit(0);
+            });
+        });
+    } else {
+        db.close((err) => {
+            if (err) {
+                console.error('Error closing database:', err.message);
+            } else {
+                console.log('Database connection closed.');
+            }
+            process.exit(0);
+        });
+    }
 });
